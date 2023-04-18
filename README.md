@@ -7,7 +7,6 @@ Recommend using a virtualenv with python3.8 (tested). Recent pybullet (3.2.2), g
 
 ## Code structure
 
-- [learning](./usc_learning/learning) for rllib and stable-baselines extensions and modifications
 - [imitation_tasks](./usc_learning/imitation_tasks) for any trajectories from the optimization, and classes to compare current robot state with desired ones, etc.
 - [envs](./usc_learning/envs) any robot classes and basic gym environments. See in particular [quadruped_master](./usc_learning/envs/quadruped_master) for a general interface for aliengo and laikago.
 
