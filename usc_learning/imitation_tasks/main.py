@@ -1,16 +1,7 @@
-"""This file implements the imitation gym environment of a quadruped.
-IT is original created similar as imitation_gym_env_lstm.py
-To get observation including history,
-See:
-traj_motion_data.py for reading in the trajectory and its interface
-sim_opt_traj_v2.py is an example of just running the trajectory
+"""This file implements jumping on a quadruped with reference from trajectory optimization.
 """
 
 import os, inspect
-
-# currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-# parentdir = os.path.dirname(os.path.dirname(currentdir))
-# os.sys.path.insert(0, parentdir)
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(os.path.dirname(currentdir))
 os.sys.path.insert(0, parentdir)
@@ -34,14 +25,8 @@ from usc_learning.imitation_tasks.traj_motion_data import TrajTaskMotionData
 import usc_learning
 from usc_learning.envs.quadruped_master.quadruped_gym_env import VIDEO_LOG_DIRECTORY
 
-opt_data = "data/jumpingFull_A1.csv"
-opt_data = 'data/jumpingFull_A1_1ms_h50_d60.csv'
 opt_data = 'data9_forward/jumpingFull_A1_1ms_h00_d60.csv'
-# opt_trajs_path = 'data9_forward'
 opt_trajs_path = 'data10_forward_2'
-
-# change resistor
-# opt_trajs_path = 'data13_forward' # jump d=60, h=10. with full constraints
 
 print('*' * 80)
 # print('opt trajs path', opt_trajs_path)
