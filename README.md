@@ -14,10 +14,5 @@ Recommend using a virtualenv with python3.8 (tested). Recent pybullet (3.2.2), g
 
 - For jumping, we use usc_learning/imitation_tasks/main.py
 
-## Useful command line
-- to delete .git file via terminal, we can use rm -fr .git
-- to delete file, rm -f filename
-- to delete folder, rm -r foldername
-
 ## TODO
 
