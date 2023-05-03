@@ -26,7 +26,8 @@ import usc_learning
 from usc_learning.envs.quadruped_master.quadruped_gym_env import VIDEO_LOG_DIRECTORY
 
 opt_data = 'data9_forward/jumpingFull_A1_1ms_h00_d60.csv'
-opt_trajs_path = 'data10_forward_2'
+# opt_trajs_path = 'data10_forward_2'
+opt_trajs_path = 'data10_forward_3'
 
 print('*' * 80)
 # print('opt trajs path', opt_trajs_path)
@@ -115,7 +116,7 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
                  render=True,
                  record_video=False,
                  env_randomizer=None,
-                 randomize_dynamics=True,
+                 randomize_dynamics=False,
                  # add_terrain_noise=False,
                  test_index=TEST_IDX,
                  test_heights=TEST_TIME_HEIGHTS_F_R,
