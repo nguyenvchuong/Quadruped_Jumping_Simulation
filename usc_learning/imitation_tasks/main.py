@@ -579,7 +579,6 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
         # self._dt_base_poss = []
         # self._dt_base_orns = []
         # self._dt_base_poss_orns = []
-
         perturbation = np.zeros(3)
 
         for _ in range(1500):
