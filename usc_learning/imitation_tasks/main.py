@@ -109,7 +109,8 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
                  set_kp_gains="HIGH",  # either LOW / HIGH
                  motor_control_mode="TORQUE",
                  # task_env= "FULL_TRAJ",
-                 task_mode="DEFAULT_CARTESIAN",
+                 # task_mode="DEFAULT_CARTESIAN",
+                 task_mode="DEFAULT",
                  land_and_settle=False,
                  # traj_num_lookahead_steps=4,
                  accurate_motor_model_enabled=True,
