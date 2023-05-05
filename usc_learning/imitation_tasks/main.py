@@ -271,7 +271,7 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
             rand_front = 0
             rand_rear = 0
             if self._randomize_dynamics:
-                    mult = 0.0
+                    mult = 0.06
                     rand_front = mult * np.random.random()
                     rand_rear = mult * np.random.random()
                     if self._land_and_settle:
@@ -283,9 +283,9 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
                     self.add_box_ff(z_height=rand_front)
                     self.add_box_rr(z_height=rand_rear)
 
-                    min_mu = 0.5
-                    ground_mu_k_front = min_mu + (1 - min_mu) * np.random.random()
-                    ground_mu_k_rear = min_mu + (1 - min_mu) * np.random.random()
+                    min_mu = 0.6
+                    ground_mu_k_front = min_mu + (1 - min_mu) * np.random.random()*0
+                    ground_mu_k_rear = min_mu + (1 - min_mu) * np.random.random()*0
                     self._pybullet_client.changeDynamics(self.box_ff, -1, lateralFriction=ground_mu_k_front)
                     self._pybullet_client.changeDynamics(self.box_rr, -1, lateralFriction=ground_mu_k_rear)
 
@@ -581,10 +581,13 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
         self._base_orns = []
         self._base_poss_orns = []
         self._foot_forces = []
+        self._GRF_x = []
+        self._GRF_y = []
+        self._GRF_z = []
         perturbation = np.zeros(3)
 
         T = 1200 # total time of each jump (e.g 1200 ms)
-        for _ in range(T):
+        for i in range(T):
             self._robot.ApplyExternalForce(perturbation)
             proc_action = self._transform_action_to_motor_command()
             self._robot.ApplyAction_v2(proc_action)
@@ -592,11 +595,27 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
             self._sim_step_counter += 1
             # self._dt_motor_torques.append(self._robot.GetMotorTorques())
             # self._dt_motor_velocities.append(self._robot.GetMotorVelocities())
-            self._base_poss.append(self._robot.GetBasePosition())
-            self._base_orns.append(self._robot.GetBaseOrientation())
-            foot_pos, foot_vel, foot_force = self._get_cartesian_imitation_action()
-            # print("foot force:", foot_force)
-            self._foot_forces.append(foot_force)
+            # self._base_poss.append(self._robot.GetBasePosition())
+            # self._base_orns.append(self._robot.GetBaseOrientation())
+            base = np.concatenate((self._robot.GetBasePosition(), self._robot.GetBaseOrientationRollPitchYaw()))
+            self._base_poss_orns.append(base)
+
+            _, _, GRF_x, GRF_y, GRF_z, feetInContactBool = self._robot.GetContactInfo()
+
+            print("Time:", i*0.001)
+            print("feetInContactBool:", feetInContactBool)
+            print("GRF_x:", GRF_x)
+            print("GRF_y:", GRF_y)
+            print("GRF_z:", GRF_z)
+
+
+            # self._foot_forces.append(f)
+            self._GRF_x.append(GRF_x)
+            self._GRF_y.append(GRF_y)
+            self._GRF_z.append(GRF_z)
+            f = np.concatenate((GRF_x, GRF_y, GRF_z))
+            self._foot_forces.append(f)
+            print(" ------------------- ")
 
             if self._is_render:
                 time.sleep(0.001)
@@ -612,7 +631,7 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
         #     self._render_step_helper()
 
         # return {"base_pos_orn": self._base_poss_orns}
-        return np.array(self._base_poss), np.array(self._base_orns), np.array(self._foot_forces)
+        return np.array(self._base_poss_orns), np.array(self._foot_forces)
 
     ######################################################################################
 
@@ -774,20 +793,16 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
 
 
 if __name__ == '__main__':
-    NUM_JUMPS = 3
+    NUM_JUMPS = 5
     for i in range (NUM_JUMPS):
-        base_poss, base_orns, foot_forces = ImitationGymEnv().jump()
+        base_poss_orns, foot_forces = ImitationGymEnv().jump()
         # print(base_poss)
         # print(obs)
-        df1 = pd.DataFrame(np.array(base_poss))
+        df1 = pd.DataFrame(np.array(base_poss_orns))
         df1.to_csv("base_poss" + str(i)+ ".csv", index=False, header=False)
         # print('exported data for base_poss for test:', i)
 
-        df2 = pd.DataFrame(np.array(base_orns))
-        df2.to_csv("base_orns" + str(i) + ".csv", index=False, header=False)
-        # print('exported data for base_orns for test:', i)
-
         df3 = pd.DataFrame(np.array(foot_forces))
-        df3.to_csv("foot_forces"  + ".csv", index=False, header=False) # Foot force reference does not change for each jump
+        df3.to_csv("foot_forces"  + str(i) + ".csv", index=False, header=False) # Foot force reference does not change for each jump
 
     print('All Exported done!!')

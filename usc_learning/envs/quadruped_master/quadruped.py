@@ -417,7 +417,9 @@ class Quadruped(object):
     # penalize this in reward function ( or terminate condition ? )
     numValidContacts = 0
     numInvalidContacts = 0
-    feetNormalForces = [0,0,0,0]
+    GRF_z = [0,0,0,0]
+    GRF_x = [0, 0, 0, 0]
+    GRF_y = [0, 0, 0, 0]
     feetInContactBool = [0,0,0,0]
     # print('=========================== contacts')
     for c in self._pybullet_client.getContactPoints():
@@ -448,7 +450,9 @@ class Quadruped(object):
           footIndex = self._foot_link_ids.index(c[4])
         except:
           footIndex = self._foot_link_ids.index(c[3])
-        feetNormalForces[footIndex] += c[9] # if multiple contact locations?
+        GRF_z[footIndex] += c[9] # if multiple contact locations?
+        GRF_y[footIndex] += c[10]  # if multiple contact locations?
+        GRF_x[footIndex] += c[12]  # if multiple contact locations?
         feetInContactBool[footIndex] = 1
 
     # # test just to make sure collisions with non-ground contacts are ok
@@ -469,7 +473,7 @@ class Quadruped(object):
     # print('contacts',feetInContactBool)
     # print(numValidContacts, numInvalidContacts, feetNormalForces, feetInContactBool)
     # print('foot links', self._foot_link_ids)
-    return numValidContacts, numInvalidContacts, feetNormalForces, feetInContactBool
+    return numValidContacts, numInvalidContacts, GRF_x, GRF_y, GRF_z, feetInContactBool
 
   def ThighsInContact(self):
     """ Check if thighs in contact (for termination condition)
