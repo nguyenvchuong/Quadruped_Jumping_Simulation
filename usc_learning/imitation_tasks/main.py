@@ -124,6 +124,7 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
                  test_heights=TEST_TIME_HEIGHTS_F_R,
                  test_mass=None,
 
+
                  **kwargs  # any extras from legacy
                  ):
         """
@@ -154,6 +155,8 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
         self._sensor_records = None
         self._robot_states = []
         self._test_mass = test_mass
+        rand_front_box = 0.05,
+        rand_rear_box = 0,
 
         def get_opt_trajs(path):
             """ Returns all optimal trajectories in directory. """
@@ -272,7 +275,7 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
             rand_front = 0
             rand_rear = 0
             if self._randomize_dynamics:
-                    mult = 0.06
+                    mult = 0.02
                     rand_front = mult * np.random.random()
                     rand_rear = mult * np.random.random()
                     if self._land_and_settle:
@@ -582,6 +585,7 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
         self._base_orns = []
         self._base_poss_orns = []
         self._foot_forces = []
+        self._foot_torque = []
         self._GRF_x = []
         self._GRF_y = []
         self._GRF_z = []
@@ -603,12 +607,21 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
 
             _, _, GRF_x, GRF_y, GRF_z, feetInContactBool = self._robot.GetContactInfo()
 
+            # force on each leg
+            GRF_FR = np.array([GRF_x[0], GRF_y[0], GRF_z[0]])
+            GRF_FL = np.array([GRF_x[1], GRF_y[1], GRF_z[1]])
+            GRF_RR = np.array([GRF_x[2], GRF_y[2], GRF_z[2]])
+            GRF_RL = np.array([GRF_x[3], GRF_y[3], GRF_z[3]])
+            print("GRF on front right:", GRF_FR)
+            print("GRF on front left:", GRF_FL)
+            print("GRF on rear right:", GRF_RR)
+            print("GRF on rear left:", GRF_RL)
+
             print("Time:", i*0.001)
             print("feetInContactBool:", feetInContactBool)
             print("GRF_x:", GRF_x)
             print("GRF_y:", GRF_y)
             print("GRF_z:", GRF_z)
-
 
             # self._foot_forces.append(f)
             self._GRF_x.append(GRF_x)
@@ -616,6 +629,37 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
             self._GRF_z.append(GRF_z)
             f = np.concatenate((GRF_x, GRF_y, GRF_z))
             self._foot_forces.append(f)
+
+            # Leg order: FR, FL, RR, RL
+            for legID in range (4):
+                J, ee_pos_legFrame = self._robot._ComputeJacobianAndPositionUSC(legID)
+                # print( ee_pos_legFrame)
+
+            # foot position at start
+            hip_pos = 0.047 # need to check again
+            pf_FR = np.array([0.183, -0.083- hip_pos, 0])
+            pf_FL= np.array([0.183, 0.083+ hip_pos, 0])
+            pf_RR= np.array([-0.183, -0.083- hip_pos, 0])
+            pf_RL= np.array([-0.183, 0.083+ hip_pos, 0])
+            print("CoM position:", self._robot.GetBasePosition())
+
+            r_FR = pf_FR - np.array(self._robot.GetBasePosition())
+            r_FL = pf_FL - np.array(self._robot.GetBasePosition())
+            r_RR = pf_RR - np.array(self._robot.GetBasePosition())
+            r_RL = pf_RL - np.array(self._robot.GetBasePosition())
+
+            tau_FR = np.cross(r_FR, GRF_FR)
+            tau_FL = np.cross(r_FL, GRF_FL)
+            tau_RR = np.cross(r_RR, GRF_RR)
+            tau_RL = np.cross(r_RL, GRF_RL)
+            tau = np.concatenate((tau_FR, tau_FL, tau_RR, tau_RL))
+            self._foot_torque.append(tau)
+
+            print("tau_FR:", tau_FR)
+            print("tau_FL:", tau_FL)
+            print("tau_RR:", tau_RR)
+            print("tau_RL:", tau_RL)
+
             print(" ------------------- ")
 
             if self._is_render:
@@ -632,7 +676,7 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
         #     self._render_step_helper()
 
         # return {"base_pos_orn": self._base_poss_orns}
-        return np.array(self._base_poss_orns), np.array(self._foot_forces)
+        return np.array(self._base_poss_orns), np.array(self._foot_forces), np.array(self._foot_torque)
 
     ######################################################################################
 
@@ -794,16 +838,19 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
 
 
 if __name__ == '__main__':
-    NUM_JUMPS = 5
+    NUM_JUMPS = 2
     for i in range (NUM_JUMPS):
-        base_poss_orns, foot_forces = ImitationGymEnv().jump()
+        base_poss_orns, foot_forces, foot_torques = ImitationGymEnv().jump()
         # print(base_poss)
         # print(obs)
         df1 = pd.DataFrame(np.array(base_poss_orns))
         df1.to_csv("base_poss" + str(i)+ ".csv", index=False, header=False)
         # print('exported data for base_poss for test:', i)
 
-        df3 = pd.DataFrame(np.array(foot_forces))
-        df3.to_csv("foot_forces"  + str(i) + ".csv", index=False, header=False) # Foot force reference does not change for each jump
+        df2 = pd.DataFrame(np.array(foot_forces))
+        df2.to_csv("foot_forces"  + str(i) + ".csv", index=False, header=False) # Foot force reference does not change for each jump
+
+        df3 = pd.DataFrame(np.array(foot_torques))
+        df3.to_csv("foot_torques"  + str(i) + ".csv", index=False, header=False) # Foot force reference does not change for each jump
 
     print('All Exported done!!')
