@@ -295,6 +295,11 @@ class Quadruped(object):
     linVel,_ = self._pybullet_client.getBaseVelocity(self.quadruped)
     return np.asarray(linVel)
 
+  def GetBaseLinearAngularVelocity(self):
+    """ Get base linear velocities (dx, dy, dz) """
+    baseVel= self._pybullet_client.getBaseVelocity(self.quadruped)
+    return baseVel
+
   def GetBaseLinearVelocity_2D(self):
     """ Get base linear velocities (dx, dy, dz) """
     linVel,_ = self._pybullet_client.getBaseVelocity(self.quadruped)

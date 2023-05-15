@@ -584,6 +584,7 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
         self._base_poss = []
         self._base_orns = []
         self._base_poss_orns = []
+        self._base_vel = []
         self._foot_forces = []
         self._foot_torque = []
         self._GRF_x = []
@@ -602,8 +603,12 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
             # self._dt_motor_velocities.append(self._robot.GetMotorVelocities())
             # self._base_poss.append(self._robot.GetBasePosition())
             # self._base_orns.append(self._robot.GetBaseOrientation())
-            base = np.concatenate((self._robot.GetBasePosition(), self._robot.GetBaseOrientationRollPitchYaw()))
-            self._base_poss_orns.append(base)
+            base_pos = np.concatenate((self._robot.GetBasePosition(), self._robot.GetBaseOrientationRollPitchYaw()))
+            self._base_poss_orns.append(base_pos)
+            # print("base_vl:", self._robot.GetBaseLinearVelocity())
+            base_vl = np.concatenate(self._robot.GetBaseLinearAngularVelocity())
+            # print("base_vl:", self._robot.GetBaseLinearVelocity())
+            self._base_vel.append(base_vl)
 
             _, _, GRF_x, GRF_y, GRF_z, feetInContactBool = self._robot.GetContactInfo()
 
@@ -612,16 +617,16 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
             GRF_FL = np.array([GRF_x[1], GRF_y[1], GRF_z[1]])
             GRF_RR = np.array([GRF_x[2], GRF_y[2], GRF_z[2]])
             GRF_RL = np.array([GRF_x[3], GRF_y[3], GRF_z[3]])
-            print("GRF on front right:", GRF_FR)
-            print("GRF on front left:", GRF_FL)
-            print("GRF on rear right:", GRF_RR)
-            print("GRF on rear left:", GRF_RL)
+            # print("GRF on front right:", GRF_FR)
+            # print("GRF on front left:", GRF_FL)
+            # print("GRF on rear right:", GRF_RR)
+            # print("GRF on rear left:", GRF_RL)
 
-            print("Time:", i*0.001)
-            print("feetInContactBool:", feetInContactBool)
-            print("GRF_x:", GRF_x)
-            print("GRF_y:", GRF_y)
-            print("GRF_z:", GRF_z)
+            # print("Time:", i*0.001)
+            # print("feetInContactBool:", feetInContactBool)
+            # print("GRF_x:", GRF_x)
+            # print("GRF_y:", GRF_y)
+            # print("GRF_z:", GRF_z)
 
             # self._foot_forces.append(f)
             self._GRF_x.append(GRF_x)
@@ -676,7 +681,7 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
         #     self._render_step_helper()
 
         # return {"base_pos_orn": self._base_poss_orns}
-        return np.array(self._base_poss_orns), np.array(self._foot_forces), np.array(self._foot_torque)
+        return np.array(self._base_poss_orns), np.array(self._base_vel), np.array(self._foot_forces), np.array(self._foot_torque)
 
     ######################################################################################
 
@@ -840,17 +845,20 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
 if __name__ == '__main__':
     NUM_JUMPS = 2
     for i in range (NUM_JUMPS):
-        base_poss_orns, foot_forces, foot_torques = ImitationGymEnv().jump()
+        base_poss_orns, base_vel, foot_forces, foot_torques = ImitationGymEnv().jump()
         # print(base_poss)
         # print(obs)
         df1 = pd.DataFrame(np.array(base_poss_orns))
         df1.to_csv("base_poss" + str(i)+ ".csv", index=False, header=False)
         # print('exported data for base_poss for test:', i)
 
-        df2 = pd.DataFrame(np.array(foot_forces))
-        df2.to_csv("foot_forces"  + str(i) + ".csv", index=False, header=False) # Foot force reference does not change for each jump
+        df2 = pd.DataFrame(np.array(base_vel))
+        df2.to_csv("base_vels" + str(i) + ".csv", index = False, header= False)
 
-        df3 = pd.DataFrame(np.array(foot_torques))
-        df3.to_csv("foot_torques"  + str(i) + ".csv", index=False, header=False) # Foot force reference does not change for each jump
+        df3 = pd.DataFrame(np.array(foot_forces))
+        df3.to_csv("foot_forces"  + str(i) + ".csv", index=False, header=False) # Foot force reference does not change for each jump
+
+        df4 = pd.DataFrame(np.array(foot_torques))
+        df4.to_csv("foot_torques"  + str(i) + ".csv", index=False, header=False) # Foot force reference does not change for each jump
 
     print('All Exported done!!')
