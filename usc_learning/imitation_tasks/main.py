@@ -628,12 +628,14 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
             # print("GRF_y:", GRF_y)
             # print("GRF_z:", GRF_z)
 
-            # self._foot_forces.append(f)
-            self._GRF_x.append(GRF_x)
-            self._GRF_y.append(GRF_y)
-            self._GRF_z.append(GRF_z)
-            f = np.concatenate((GRF_x, GRF_y, GRF_z))
+            f = np.concatenate((GRF_FR, GRF_FL, GRF_RR, GRF_RL))
             self._foot_forces.append(f)
+            # self._foot_forces.append(f)
+            # self._GRF_x.append(GRF_x)
+            # self._GRF_y.append(GRF_y)
+            # self._GRF_z.append(GRF_z)
+            # f = np.concatenate((GRF_x, GRF_y, GRF_z))
+            # self._foot_forces.append(f)
 
             # Leg order: FR, FL, RR, RL
             for legID in range (4):
