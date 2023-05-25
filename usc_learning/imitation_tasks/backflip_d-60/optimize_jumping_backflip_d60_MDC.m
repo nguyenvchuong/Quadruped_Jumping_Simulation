@@ -3,12 +3,12 @@
 clc; close all;
 % clear all; use this if change dyanmics
 robot = 2; %(0=Cheetah 3; 1= AlienGo; 2=A1)
-option.platform_height= -1;
+option.platform_height= 0;
 % option.jumping_length= -0.5; %0.6
-option.jumping_length= - 1.2; %0.6
+option.jumping_length= - 0.6; %0.6
 option.pitch_end_offset= 0; % clockwise is positive
 % option.jumping_length= -0.4; option.platform_height= 0;  % backflip
-option.pitch_end_offset=-4*pi; % clockwise is positive
+option.pitch_end_offset=-2*pi; % clockwise is positive
 
 option.jump_with_4_legs=0;
 option.knee_sign=1; % 1: knee backward, -1: knee forward
@@ -48,9 +48,9 @@ R_motor = 25*Kt*Kt;
 
 double_contact = 50*res;
 single_contact = 30*res;
-flight_phase = 70*res;
+flight_phase = 50*res;
 
-option.file_name='double_backflip_MDC_503070';
+option.file_name='backflipFull_A1_1ms_h0_d-60';
 
 
 if robot == 1 % AlienGo
