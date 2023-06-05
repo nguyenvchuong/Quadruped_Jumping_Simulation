@@ -646,10 +646,10 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
 
             # foot position at start
             hip_pos = 0.047 # need to check again
-            pf_FR = np.array([0.183, -0.083- hip_pos, 0])
-            pf_FL= np.array([0.183, 0.083+ hip_pos, 0])
-            pf_RR= np.array([-0.183, -0.083- hip_pos, 0])
-            pf_RL= np.array([-0.183, 0.083+ hip_pos, 0])
+            pf_FR = np.array([0.183, -0.083- hip_pos, 1])
+            pf_FL= np.array([0.183, 0.083+ hip_pos, 1])
+            pf_RR= np.array([-0.183, -0.083- hip_pos, 1])
+            pf_RL= np.array([-0.183, 0.083+ hip_pos, 1])
             print("CoM position:", self._robot.GetBasePosition())
 
             r_FR = pf_FR - np.array(self._robot.GetBasePosition())
