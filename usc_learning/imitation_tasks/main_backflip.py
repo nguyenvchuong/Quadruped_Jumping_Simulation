@@ -27,8 +27,7 @@ import usc_learning
 from usc_learning.envs.quadruped_master.quadruped_gym_env import VIDEO_LOG_DIRECTORY
 
 opt_data = 'data9_forward/jumpingFull_A1_1ms_h00_d60.csv'
-opt_trajs_path = 'double_backflip'
-# opt_trajs_path = 'backflip_d-60'
+opt_trajs_path = 'backflip_d-60'
 
 print('*' * 80)
 # print('opt trajs path', opt_trajs_path)
@@ -266,13 +265,12 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
                 #     print('Current traj is:', curr_traj_name)
                 #     print('Adding box at h', jump_height, 'd', jump_dist)
                 #     self.add_box_at(jump_height, jump_dist)
-                self.add_box_at(1, 0)
 
             else:
                 if self._is_render:
                     self.add_box_at(0.01, 0.6)
 
-            self._robot_config.INIT_POSITION = [0, 0, 0.2+1]
+            self._robot_config.INIT_POSITION = [0, 0, 0.2]
             rand_front = 0
             rand_rear = 0
             if self._randomize_dynamics:
@@ -593,7 +591,7 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
         self._GRF_z = []
         perturbation = np.zeros(3)
 
-        T = 1500 # total time of each jump (e.g 1200 ms)
+        T = 1300 # total time of each jump (e.g 1200 ms)
         for i in range(T):
             self._robot.ApplyExternalForce(perturbation)
             proc_action = self._transform_action_to_motor_command()
@@ -604,11 +602,10 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
             # self._dt_motor_velocities.append(self._robot.GetMotorVelocities())
             # self._base_poss.append(self._robot.GetBasePosition())
             # self._base_orns.append(self._robot.GetBaseOrientation())
-            base_pos = np.concatenate((self._robot.GetBasePosition(), self._robot.GetBaseOrientationRollPitchYaw()))
+            base_pos = np.concatenate((self._robot.GetBasePosition(), self._robot.GetBaseOrientation()))
             self._base_poss_orns.append(base_pos)
             # print("base_vl:", self._robot.GetBaseLinearVelocity())
             base_vl = np.concatenate(self._robot.GetBaseLinearAngularVelocity())
-            print("base_vl:", base_vl)
             # print("base_vl:", self._robot.GetBaseLinearVelocity())
             self._base_vel.append(base_vl)
 
@@ -646,10 +643,10 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
 
             # foot position at start
             hip_pos = 0.047 # need to check again
-            pf_FR = np.array([0.183, -0.083- hip_pos, 1])
-            pf_FL= np.array([0.183, 0.083+ hip_pos, 1])
-            pf_RR= np.array([-0.183, -0.083- hip_pos, 1])
-            pf_RL= np.array([-0.183, 0.083+ hip_pos, 1])
+            pf_FR = np.array([0.183, -0.083- hip_pos, 0])
+            pf_FL= np.array([0.183, 0.083+ hip_pos, 0])
+            pf_RR= np.array([-0.183, -0.083- hip_pos, 0])
+            pf_RL= np.array([-0.183, 0.083+ hip_pos, 0])
             print("CoM position:", self._robot.GetBasePosition())
 
             r_FR = pf_FR - np.array(self._robot.GetBasePosition())

@@ -604,7 +604,8 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
             # self._dt_motor_velocities.append(self._robot.GetMotorVelocities())
             # self._base_poss.append(self._robot.GetBasePosition())
             # self._base_orns.append(self._robot.GetBaseOrientation())
-            base_pos = np.concatenate((self._robot.GetBasePosition(), self._robot.GetBaseOrientationRollPitchYaw()))
+            # base_pos = np.concatenate((self._robot.GetBasePosition(), self._robot.GetBaseOrientationRollPitchYaw()))
+            base_pos = np.concatenate((self._robot.GetBasePosition(), self._robot.GetBaseOrientation()))
             self._base_poss_orns.append(base_pos)
             # print("base_vl:", self._robot.GetBaseLinearVelocity())
             base_vl = np.concatenate(self._robot.GetBaseLinearAngularVelocity())
@@ -646,10 +647,10 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
 
             # foot position at start
             hip_pos = 0.047 # need to check again
-            pf_FR = np.array([0.183, -0.083- hip_pos, 1])
-            pf_FL= np.array([0.183, 0.083+ hip_pos, 1])
-            pf_RR= np.array([-0.183, -0.083- hip_pos, 1])
-            pf_RL= np.array([-0.183, 0.083+ hip_pos, 1])
+            pf_FR = np.array([0.183, -0.083 - hip_pos, 1])
+            pf_FL= np.array([0.183, 0.083 + hip_pos, 1])
+            pf_RR= np.array([-0.183, -0.083 - hip_pos, 1])
+            pf_RL= np.array([-0.183, 0.083 + hip_pos, 1])
             print("CoM position:", self._robot.GetBasePosition())
 
             r_FR = pf_FR - np.array(self._robot.GetBasePosition())

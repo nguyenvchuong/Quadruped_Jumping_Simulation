@@ -602,7 +602,7 @@ class ImitationGymEnv(quadruped_gym_env.QuadrupedGymEnv):
             # self._dt_motor_velocities.append(self._robot.GetMotorVelocities())
             # self._base_poss.append(self._robot.GetBasePosition())
             # self._base_orns.append(self._robot.GetBaseOrientation())
-            base_pos = np.concatenate((self._robot.GetBasePosition(), self._robot.GetBaseOrientationRollPitchYaw()))
+            base_pos = np.concatenate((self._robot.GetBasePosition(), self._robot.GetBaseOrientation()))
             self._base_poss_orns.append(base_pos)
             # print("base_vl:", self._robot.GetBaseLinearVelocity())
             base_vl = np.concatenate(self._robot.GetBaseLinearAngularVelocity())
